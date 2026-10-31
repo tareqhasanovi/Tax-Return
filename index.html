@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BD e-Return Prep – IT-11GA (AY 2026-27)</title>
+<style>
+:root{--ink:#12261f;--g:#0b6e4f;--gd:#07503a;--field:#eef3f0;--line:#c9d6cf;--amb:#e8a317;--red:#b3261e;--bg:#f7f9f8}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.5 "Segoe UI","Noto Sans Bengali",system-ui,sans-serif;color:var(--ink);background:var(--bg);padding-bottom:84px}
+header{background:var(--g);color:#fff;padding:18px 20px}
+header h1{margin:0;font:600 22px Georgia,"Noto Serif Bengali",serif}
+header p{margin:4px 0 0;opacity:.9;font-size:13px}
+.warn{background:#fff6dd;border-left:4px solid var(--amb);margin:14px 20px 0;padding:10px 14px;font-size:13px;max-width:980px}
+.wrap{display:flex;gap:20px;padding:16px 20px;max-width:1180px;margin:auto}
+nav{width:210px;flex:none;position:sticky;top:12px;align-self:flex-start}
+nav button{display:block;width:100%;text-align:left;background:none;border:0;border-left:3px solid var(--line);padding:8px 12px;font:inherit;cursor:pointer;color:var(--ink)}
+nav button.on{border-color:var(--g);background:#fff;font-weight:600;color:var(--g)}
+nav button:focus-visible,input:focus-visible,select:focus-visible,.btn:focus-visible{outline:3px solid var(--amb);outline-offset:1px}
+main{flex:1;min-width:0}
+.panel{display:none;background:#fff;border:1px solid var(--line);border-radius:6px;padding:18px 20px}
+.panel.on{display:block}
+h2{margin:0 0 4px;font:600 20px Georgia,serif;color:var(--gd)}
+h3{margin:22px 0 8px;font-size:15px;border-bottom:2px solid var(--line);padding-bottom:4px}
+.sub{margin:0 0 12px;font-size:13px;color:#4a5f56}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px 14px}
+.f{display:flex;flex-direction:column;font-size:13px;gap:3px}
+.f span{color:#33473f}
+input,select{font:inherit;padding:7px 9px;border:1px solid var(--line);background:var(--field);border-radius:4px;width:100%;color:var(--ink)}
+.o{display:flex;justify-content:space-between;gap:10px;padding:7px 10px;border-bottom:1px solid var(--line);font-size:14px}
+.o b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.o.t{background:var(--field);font-weight:700}
+.o.bad b{color:var(--red)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+th{background:var(--field);font-weight:600}
+td.n{width:150px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:#fff;display:flex;gap:26px;justify-content:center;flex-wrap:wrap;padding:10px 14px;z-index:5}
+.bar div{font-size:12px}.bar b{display:block;font-size:17px;font-variant-numeric:tabular-nums}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--g);color:#fff;border:0;padding:9px 16px;border-radius:4px;font:inherit;cursor:pointer}
+.btn.alt{background:#fff;color:var(--g);border:1px solid var(--g)}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:13px;padding:3px 0}.chk input{width:auto;margin-top:3px}
+.note{font-size:12px;color:#4a5f56;margin-top:6px}
+@media(max-width:800px){.wrap{flex-direction:column}nav{width:100%;position:static;display:flex;overflow-x:auto}nav button{white-space:nowrap;width:auto;border-left:0;border-bottom:3px solid var(--line)}nav button.on{border-bottom-color:var(--g)}}
+@media print{header p,.warn,nav,.bar,.btns,.pager{display:none}.panel{display:block!important;border:0;page-break-inside:avoid}input,select{border:0;border-bottom:1px solid #999;background:none}body{padding:0}}
+</style>
+</head>
+<body>
+<header>
+<h1>আয়কর রিটার্ন প্রস্তুতকারী · IT-11GA</h1>
+<p>Individual income tax return preparer · Assessment Year 2026-27 (income year 1 Jul 2025 – 30 Jun 2026) · Income Tax Act 2023 (আয়কর আইন ২০২৩)</p>
+</header>
+<div class="warn"><b>Preparation tool, not the official portal.</b> It computes your return under the Income Tax Act 2023 as amended by the Finance Act 2026 and gives you figures to enter at <b>etaxnbr.gov.bd</b>, where filing is done. Data stays in your browser. Rates are listed in the <code>CFG</code> object in this file; confirm them against NBR's Income Tax Guide 2026-27.</div>
+<div class="wrap">
+<nav id="nav" aria-label="Return sections"></nav>
+<main id="main"></main>
+</div>
+<div class="bar" aria-live="polite">
+<div>Total income (Sl. 11)<b data-o="s11">0</b></div>
+<div>Tax payable (Sl. 16)<b data-o="s16">0</b></div>
+<div>Total payable (Sl. 19)<b data-o="s19">0</b></div>
+<div>Balance to pay / (refund)<b data-o="due">0</b></div>
+</div>
+<script>
+/* ---------- Tax parameters: Income Tax Act 2023 as amended by Finance Act 2026, AY 2026-27. Edit here for a new year. ---------- */
+const CFG={
+ thr:{gen:400000,fem:450000,dis:525000,ff:550000,dep:50000},   // tax-free thresholds
+ slabs:[[300000,.10],[400000,.15],[500000,.20],[2000000,.25],[Infinity,.30]],
+ nrFlat:.30, minTax:5000, minNew:1000,
+ rebPct:.10, rebIncPct:.03, rebMax:750000,
+ caps:{dps:120000,gov:500000,mf:7500000,sh:7500000}, lifePct:.10,
+ salFrac:1/3, salMax:500000, repair:.25,
+ wealth:[[5e8,.35],[2e8,.30],[1e8,.20],[4e7,.10]], surMin:.10,
+ early:{pct:.05,cap:25000}, late:{3:[.02,3000],4:[.05,5000],5:[.10,5000]}
+};
+/* ---------- helpers ---------- */
+const S=JSON.parse(localStorage.getItem('bdret')||'{}');
+const n=k=>parseFloat(S[k])||0, yes=k=>S[k]==='y';
+const fmt=v=>Math.round(v).toLocaleString('en-IN');
+const F=(k,l,t='number',x='')=>`<label class="f"><span>${l}</span><input data-k="${k}" type="${t}" ${t==='number'?'step="any" inputmode="decimal"':''} ${x}></label>`;
+const SEL=(k,l,o)=>`<label class="f"><span>${l}</span><select data-k="${k}">${o.map(([v,t])=>`<option value="${v}">${t}</option>`).join('')}</select></label>`;
+const YN=(k,l)=>SEL(k,l,[['n','No'],['y','Yes']]);
+const OUT=(id,l,c='')=>`<div class="o ${c}"><span>${l}</span><b data-o="${id}">0</b></div>`;
+const IN=(k)=>`<input data-k="${k}" type="number" step="any" inputmode="decimal">`;
+const grid=a=>`<div class="grid">${a.join('')}</div>`;
+const rows=(list,pre)=>list.map((l,i)=>`<tr><td>${i+1}. ${l}</td><td class="n">${IN(pre+(i+1))}</td></tr>`).join('');
+
+/* ---------- form definitions ---------- */
+const GOV=['Basic pay','Arrear pay (if not taxed earlier)','Special allowance','House rent allowance','Medical allowance','Conveyance allowance','Festival allowance','Support staff allowance','Leave allowance','Honorarium / reward','Overtime allowances','Bangla Noboborsho allowance','Interest accrued on Provident Fund','Lump grant','Gratuity','Others, if any'];
+const NG=['Basic pay','Allowances','Advance / arrear salary','Gratuity, annuity, pension or similar benefit','Perquisites','Receipt in lieu of or in addition to salary','Income from employee’s share scheme','Accommodation facility','Transport facility','Any other facility provided by employer','Employer’s contribution to recognized provident fund','Others, if any'];
+const RENT=[['rent','Rent received or annual value (higher)'],['adv','Advance rent received'],['ben','Value of other benefit'],['adj','Adjusted advance rent'],['vac','Vacancy allowance'],['mun','Municipal / local tax'],['land','Land revenue'],['int','Interest on loan / mortgage / capital charge'],['ins','Insurance premium paid'],['oth','Other allowable deduction']];
+const REB=[['Life insurance premium / contractual deferred annuity paid in Bangladesh','life'],['Contribution to Deposit Pension Scheme (DPS)','dps'],['Government securities / Sanchaypatra','gov'],['Unit certificate, mutual fund, ETF, joint investment scheme','mf'],['Securities listed with approved stock exchange','sh'],['Contribution to Provident Fund (PF Act 1925)',''],['Self & employer’s contribution to recognized PF',''],['Contribution to superannuation fund',''],['Benevolent fund / group insurance premium',''],['Zakat fund',''],['Others, if any','']];
+const LS=['Personal and family food, clothing and other essentials','Housing expense','Personal transport expense','Utility expense (electricity, gas, water, phone, internet)','Education expense','Local and foreign travel, vacation','Festival and other special expense','Tax deducted at source and tax & surcharge paid on last year’s return','Interest paid on personal loans'];
+const AST=[['ba','Total asset of business'],['bl','Less: business liabilities'],['dir','Director’s shareholdings in companies'],['firm','Business capital of partnership firm'],['nonag','Non-agricultural property / land / house (cost value)'],['ag','Agricultural property (cost value)'],['f1','Shares / debentures / bonds / securities / unit certificates'],['f2','Sanchaypatra / Deposit Pension Scheme'],['f3','Loan given (keep name & NID of receiver)'],['f4','Savings deposit / term deposit'],['f5','Provident fund or other fund'],['f6','Other investment'],['car','Motor vehicle(s) (cost incl. registration)'],['orn','Ornaments (cost value)'],['fur','Furniture and electronic items'],['oa','Other assets'],['bank','Bank balance'],['cash','Cash in hand'],['co','Other cash / funds outside business'],['abr','Assets outside Bangladesh']];
+const DOCS=['Salary statement / employer’s certificate','Bank statement and interest certificate','Interest / profit certificate (Sanchaypatra, DPS, FDR)','TDS certificates and challans','Rent agreement, municipal tax and land revenue receipts, loan interest statement','Statement of professional income / business accounts, depreciation chart','Assessment copy and balance sheet of firm (partnership income)','Capital gain documents and dividend warrants','Statement of other income','Proof of tax-exempt income','Proof of investments (certificates, premium, DPS, Zakat, shares, PF)','Statement of income of spouse (if not taxpayer), minor children, dependants','IT-10BB (lifestyle) and IT-10B (assets & liabilities)','Computation of income under Income Tax Act 2023','Other'];
+
+const rentCols=[1,2,3].map(p=>`<th>Property ${p}</th>`).join('');
+const rentRows=RENT.map(([k,l])=>`<tr><td>${l}</td>${[1,2,3].map(p=>`<td>${IN(k+p)}</td>`).join('')}</tr>`).join('');
+
+const PANELS=[
+['Taxpayer information',`<h2>Taxpayer information (Sl. 1–14)</h2><p class="sub">Item 8 ticks decide your tax-free threshold.</p>`+grid([F('name','1. Name of taxpayer','text'),F('nid','2. NID / passport no.','text'),F('tin','3. TIN (12 digits)','text','maxlength="12"'),F('circle','4(a) Circle','text'),F('zone','4(b) Taxes Zone','text'),F('ay','5. Assessment year','text','value="2026-27" readonly'),SEL('res','6. Residential status',[['res','Resident'],['nrb','Non-resident Bangladeshi'],['nrf','Non-resident, not a Bangladeshi citizen']]),SEL('stat','7. Taxpayer’s status',[['i','Individual']]),F('dob','9. Date of birth','date'),F('spouse','10. Spouse’s name','text'),F('stin','Spouse’s TIN (if taxpayer)','text'),F('addr','11. Address','text'),F('tel','Telephone','tel'),F('mob','Mobile','tel'),F('mail','E-mail','email'),F('emp','12. Employer’s name (latest)','text'),F('org','13(a) Name of organization','text'),F('bin','13(b) BIN','text'),F('part','14. Partners / members and TIN (firm / AoP)','text')])+`<h3>8. Special benefit claims</h3>`+grid([YN('ff','Gazetted war-wounded freedom fighter / wounded July fighter'),YN('fem','Female'),YN('tg','Third gender'),YN('dis','Person with disability'),YN('s65','Aged 65 or more'),YN('par','Parent of a person with disability'),F('ndep','Number of disabled children / dependants')])],
+
+['Employment (Sch. 1)',`<h2>Income from employment – Schedule 1</h2><p class="sub">Feeds Sl. 1. Choose the part that matches your employer.</p>`+grid([SEL('emptype','Employment type',[['ng','Non-government / other'],['gov','Government pay scale']])])+`
+<div id="gov"><h3>1(a) Government pay scale</h3><table><tr><th>Particulars</th><th>Total (Tk)</th><th>Exempt (Tk)</th></tr>${GOV.map((l,i)=>`<tr><td>${i+1}. ${l}</td><td class="n">${IN('gt'+i)}</td><td class="n">${IN('ge'+i)}</td></tr>`).join('')}</table>${OUT('gtT','Total')}${OUT('geT','Exempted')}${OUT('gxT','Taxable income from employment','t')}</div>
+<div id="ng"><h3>1(b) Other than government pay scale</h3><table>${rows(NG,'n')}</table>${OUT('nT','13. Total salary received')}<table><tr><td>Additional exemption beyond 1/3 or Tk 5 lakh rule (Sixth Schedule Part 1)</td><td class="n">${IN('nx')}</td></tr></table>${OUT('nE','14. Exempted amount (lower of 1/3 or Tk 5,00,000, plus additional)')}${OUT('nX','15. Total income from salary','t')}</div>`],
+
+['Rent (Sch. 2)',`<h2>Income from house property – Schedule 2</h2><p class="sub">Standard 25% deduction for repair and collection is added automatically.</p><table><tr><th>Item</th>${rentCols}</tr><tr><td>Description / location</td>${[1,2,3].map(p=>`<td><input data-k="loc${p}" type="text"></td>`).join('')}</tr><tr><td>Your ownership share (%)</td>${[1,2,3].map(p=>`<td><input data-k="own${p}" type="number" value="100" min="0" max="100"></td>`).join('')}</tr>${rentRows}</table><h3>Result</h3>${[1,2,3].map(p=>OUT('rn'+p,'Property '+p+' – taxpayer’s share of net income')).join('')}${OUT('rnT','Total rental income (Sl. 2)','t')}`],
+
+['Agriculture & business',`<h2>Agriculture and business – Schedules 3 and 4</h2><h3>Schedule 3 – Agriculture</h3>`+grid([F('agn','Nature of agriculture','text'),F('ag1','Sales / turnover / receipts'),F('ag2','Gross profit'),F('ag3','Expenses, land revenue, interest, insurance, other')])+OUT('agN','Net profit (Sl. 3)','t')+`<h3>Schedule 4 – Business</h3>`+grid([F('bn','Name of business','text'),F('bk','Nature of business','text'),F('ba2','Address of business','text'),F('b1','Sales / turnover / receipts'),F('b2','Gross profit'),F('b3','General, administrative, selling and other expenses'),F('b4','Bad debt expense')])+OUT('bN','Net profit (Sl. 4)','t')+`<h3>Business balance sheet</h3>`+grid([F('c6','Cash and bank balance'),F('c7','Inventory'),F('c8','Fixed assets'),F('c9','Other assets'),F('c11','Opening capital'),F('c13','Drawing during the year'),F('c15','Liabilities')])+OUT('bA','Total assets')+OUT('bC','Total capital & liabilities')+OUT('bK','Balance check (must be 0)','bad')],
+
+['Other income (Sl. 5–10)',`<h2>Other heads of income</h2><p class="sub">Enter taxable amounts for the income year.</p>`+grid([F('s5','5. Capital gain'),F('s6','6. Financial assets (bank interest, dividend, Sanchaypatra, securities profit)'),F('s7','7. Other sources (royalty, licence fees, honorarium, incentive)'),F('s8','8. Share of income from firm or AoP'),F('s9','9. Income of minor or spouse (if not taxpayer)'),F('s10','10. Taxable income from abroad')])+`<h3>Income taxed at a separate rate (already included above)</h3><p class="sub">Example: dividend 100000 at 15%. Left out of slab calculation and taxed at its own rate.</p><table><tr><th>Description</th><th>Amount</th><th>Rate %</th></tr>${[1,2,3].map(i=>`<tr><td><input data-k="sd${i}" type="text"></td><td>${IN('sa'+i)}</td><td>${IN('sr'+i)}</td></tr>`).join('')}</table>`],
+
+['Rebate (Sch. 5)',`<h2>Investment tax credit – Schedule 5</h2><p class="sub">Only investments made in the income year count. Rebate is the lowest of 3% of income, 10% of eligible investment and Tk 7,50,000, and it cannot take your tax below the minimum.</p><table><tr><th>Investment</th><th>Amount (Tk)</th><th>Eligible (Tk)</th></tr>${REB.map(([l,c],i)=>`<tr><td>${i+1}. ${l}${c==='life'?'<br><small>Policy sum assured:</small> '+IN('lifeSA'):''}</td><td class="n">${IN('r'+i)}</td><td class="n"><b data-o="re${i}">0</b></td></tr>`).join('')}</table>${OUT('reT','11. Total eligible investment','t')}${OUT('reA','12. Tax rebate (carried to Sl. 13)','t')}<p class="note">Caps used: DPS Tk 1,20,000; government securities Tk 5,00,000; mutual funds and listed shares Tk 75,00,000; life premium up to 10% of sum assured. Verify against Sixth Schedule Part 3.</p>`],
+
+['Lifestyle & assets',`<h2>IT-10BB and IT-10B</h2><h3>IT-10BB – Lifestyle expenses</h3><table>${rows(LS,'l')}</table>${OUT('lsT','Total lifestyle expense','t')}<h3>IT-10B – Sources of fund and wealth (as on 30 June 2026)</h3>`+grid([F('gift','Receipt of gift and others'),F('prev','Net wealth at last date of previous year'),F('xexp','Gift / expense / loss not in IT-10BB'),F('li1','Institutional liabilities'),F('li2','Non-institutional liabilities'),F('li3','Other liabilities')])+`<h3>Assets (at cost value)</h3><table>${AST.map(([k,l])=>`<tr><td>${l}</td><td class="n">${IN(k)}</td></tr>`).join('')}</table>${OUT('wSrc','Total source of fund (income + exempt income + gifts)')}${OUT('wNet','5. Net wealth at last date (sources + previous wealth − expenses)')}${OUT('wGross','7. Gross wealth (net wealth + liabilities)')}${OUT('wAst','10. Total assets')}${OUT('wChk','Reconciliation: gross wealth − total assets (must be 0)','bad t')}<p class="note">A gap means an asset, liability or source of income is missing; NBR may treat an unexplained gap as undisclosed income.</p>`],
+
+['Tax & payment',`<h2>Tax computation and payment (Sl. 12–26)</h2><h3>Inputs that affect the calculation</h3>`+grid([SEL('win','When will you submit?',[['1','1 Jul – 30 Sep (early incentive)'],['2','1 Oct – 31 Dec (normal)'],['3','1 Jan – 31 Mar (additional tax)'],['4','1 Apr – 30 Jun (additional tax)'],['5','After the assessment year']]),YN('newtp','First-ever return (new taxpayer)?'),F('cars','Number of motor cars owned'),YN('bigh','House property of 8,000 sq ft or more?'),F('s17b','17(b) Environmental surcharge'),F('pen','Other delay interest / penalty')])+`<h3>Tax computation</h3>${OUT('thr','Tax-free threshold applied')}${OUT('slabT','Slab tax')}${OUT('sepT','Tax on separate-rate income')}${OUT('s12','12. Gross tax')}${OUT('s13','13. Tax rebate')}${OUT('s14','14. Net tax after rebate')}${OUT('s15','15. Minimum tax')}${OUT('s16','16. Tax payable (higher of 14 and 15)','t')}${OUT('s17a','17(a) Net wealth surcharge')}${OUT('s17b','17(b) Environmental surcharge')}${OUT('s18','18. Delay interest / additional tax / (early incentive)')}${OUT('s19','19. Total amount payable','t')}<h3>Tax payment</h3>`+grid([F('s20','20. Tax deducted / collected at source'),F('s21','21. Advance tax paid'),F('s22','22. Adjustment of tax refund'),F('s23','23. Tax paid with this return'),F('s26','26. Tax-exempt / tax-free income')])+`${OUT('s24','24. Total tax paid and adjusted')}${OUT('s25','25. Excess payment')}${OUT('due','Balance still to pay / (refundable)','t')}`],
+
+['Summary & print',`<h2>Return summary</h2><p class="sub">Check each figure, then enter it at etaxnbr.gov.bd.</p><h3>Particulars of income</h3>${['Employment','Rent','Agriculture','Business','Capital gain','Financial assets','Other sources','Share of firm / AoP','Minor / spouse income','Income from abroad'].map((l,i)=>OUT('i'+(i+1),(i+1)+'. '+l)).join('')}${OUT('s11','11. Total income','t')}${OUT('s16','16. Tax payable')}${OUT('s19','19. Total amount payable','t')}${OUT('due','Balance to pay / (refund)','t')}<h3>Documents furnished</h3>${DOCS.map((d,i)=>`<label class="chk"><input type="checkbox" data-k="d${i}"> ${d}</label>`).join('')}<h3>Verification</h3>`+grid([F('fath','Father / husband’s name','text'),F('place','Place','text'),F('vdate','Date','date')])+`<p class="note">I solemnly declare that to the best of my knowledge and belief the information given in this return and the statements and documents annexed is correct and complete.</p><div class="btns"><button class="btn" onclick="window.print()">Print / save as PDF</button><button class="btn alt" onclick="exportJ()">Download data (.json)</button><label class="btn alt">Load data<input type="file" accept=".json" hidden onchange="importJ(this)"></label><button class="btn alt" onclick="if(confirm('Erase all entered data?')){localStorage.removeItem('bdret');location.reload()}">Clear all</button></div>`]
+];
+
+/* ---------- build UI ---------- */
+const nav=document.getElementById('nav'),main=document.getElementById('main');
+PANELS.forEach(([t,h],i)=>{
+ nav.insertAdjacentHTML('beforeend',`<button data-i="${i}">${i+1}. ${t}</button>`);
+ main.insertAdjacentHTML('beforeend',`<section class="panel" id="p${i}">${h}<div class="btns pager">${i?`<button class="btn alt" data-go="${i-1}">Back</button>`:''}${i<PANELS.length-1?`<button class="btn" data-go="${i+1}">Next</button>`:''}</div></section>`);
+});
+function show(i){document.querySelectorAll('.panel').forEach((p,j)=>p.classList.toggle('on',i===j));nav.querySelectorAll('button').forEach((b,j)=>b.classList.toggle('on',i===j));scrollTo(0,0);location.hash='s'+i}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-i],[data-go]');if(b)show(+(b.dataset.i??b.dataset.go))});
+document.querySelectorAll('[data-k]').forEach(el=>{
+ const k=el.dataset.k;
+ if(el.type==='checkbox')el.checked=S[k]==='1';
+ else if(S[k]!=null)el.value=S[k];else if(el.value!=='')S[k]=el.value;
+ el.addEventListener('input',()=>{S[k]=el.type==='checkbox'?(el.checked?'1':''):el.value;localStorage.setItem('bdret',JSON.stringify(S));calc()});
+});
+function exportJ(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download='it11ga-ay2026-27.json';a.click()}
+function importJ(i){const r=new FileReader();r.onload=()=>{localStorage.setItem('bdret',r.result);location.reload()};r.readAsText(i.files[0])}
+
+/* ---------- calculation ---------- */
+function O(id,v){document.querySelectorAll(`[data-o="${id}"]`).forEach(e=>e.textContent=fmt(v))}
+function calc(){
+ // Schedule 1
+ let emp=0;const gov=S.emptype==='gov';
+ document.getElementById('gov').style.display=gov?'':'none';document.getElementById('ng').style.display=gov?'none':'';
+ let gt=0,ge=0;GOV.forEach((_,i)=>{gt+=n('gt'+i);ge+=n('ge'+i)});
+ let nt=0;for(let i=1;i<=12;i++)nt+=n('n'+i);
+ const ne=Math.min(nt,Math.min(nt*CFG.salFrac,CFG.salMax)+n('nx'));
+ O('gtT',gt);O('geT',ge);O('gxT',gt-ge);O('nT',nt);O('nE',ne);O('nX',nt-ne);
+ emp=gov?Math.max(0,gt-ge):nt-ne;
+ // Schedule 2
+ let rent=0;
+ for(let p=1;p<=3;p++){
+  const v=n('rent'+p)+n('adv'+p)+n('ben'+p)-n('adj'+p)-n('vac'+p);
+  const d=v*CFG.repair+n('mun'+p)+n('land'+p)+n('int'+p)+n('ins'+p)+n('oth'+p);
+  const sh=(v-d)*((S['own'+p]===''?0:(S['own'+p]??100))/100);
+  O('rn'+p,sh);rent+=sh;
+ }
+ O('rnT',rent);
+ // Schedules 3, 4
+ const agri=n('ag2')-n('ag3'),bus=n('b2')-n('b3')-n('b4');
+ O('agN',agri);O('bN',bus);
+ const bA=n('c6')+n('c7')+n('c8')+n('c9'),bC=n('c11')+bus-n('c13')+n('c15');
+ O('bA',bA);O('bC',bC);O('bK',bA-bC);
+ // Total income
+ const inc=[emp,rent,agri,bus,n('s5'),n('s6'),n('s7'),n('s8'),n('s9'),n('s10')];
+ inc.forEach((v,i)=>O('i'+(i+1),v));
+ const total=inc.reduce((a,b)=>a+b,0);O('s11',total);
+ // threshold
+ const nrf=S.res==='nrf';
+ let thr=CFG.thr.gen;
+ if(yes('fem')||yes('s65'))thr=Math.max(thr,CFG.thr.fem);
+ if(yes('tg')||yes('dis'))thr=Math.max(thr,CFG.thr.dis);
+ if(yes('ff'))thr=Math.max(thr,CFG.thr.ff);
+ if(yes('par'))thr+=CFG.thr.dep*n('ndep');
+ if(nrf)thr=0;
+ O('thr',thr);
+ // separate-rate income and slab tax
+ let sepI=0,sepT=0;for(let i=1;i<=3;i++){sepI+=n('sa'+i);sepT+=n('sa'+i)*n('sr'+i)/100}
+ let rem=Math.max(0,total-sepI),slab=0;
+ if(nrf)slab=Math.max(0,total)*CFG.nrFlat;
+ else{rem=Math.max(0,rem-thr);for(const[w,r]of CFG.slabs){const x=Math.min(rem,w);slab+=x*r;rem-=x;if(rem<=0)break}}
+ O('slabT',slab);O('sepT',sepT);
+ const gross=slab+(nrf?0:sepT);O('s12',gross);
+ // Schedule 5 rebate
+ let elig=0;
+ REB.forEach(([l,c],i)=>{let a=n('r'+i),e=a;
+  if(c==='life'&&n('lifeSA')>0)e=Math.min(a,n('lifeSA')*CFG.lifePct);
+  else if(c&&CFG.caps[c]!=null)e=Math.min(a,CFG.caps[c]);
+  O('re'+i,e);elig+=e});
+ const win=+(S.win||2),base=Math.max(0,total-sepI-n('s8'));
+ const reb=win===5?0:Math.min(base*CFG.rebIncPct,elig*CFG.rebPct,CFG.rebMax);
+ O('reT',elig);O('reA',reb);
+ const applied=Math.max(0,Math.min(reb,gross));O('s13',applied);
+ const s14=gross-applied;O('s14',s14);
+ const s15=total>thr?(yes('newtp')?CFG.minNew:CFG.minTax):0;O('s15',s15);
+ const s16=Math.max(s14,s15);O('s16',s16);
+ // IT-10BB / IT-10B
+ let ls=0;for(let i=1;i<=9;i++)ls+=n('l'+i);O('lsT',ls);
+ const src=total+n('s26')+n('gift'),net=src+n('prev')-ls-n('xexp');
+ const liab=n('li1')+n('li2')+n('li3');
+ let ast=0;AST.forEach(([k])=>{ast+=k==='bl'?-n(k):n(k)});
+ O('wSrc',src);O('wNet',net);O('wGross',net+liab);O('wAst',ast);O('wChk',net+liab-ast);
+ // surcharge
+ const nw=ast-liab;let sr=0;for(const[t,r]of CFG.wealth)if(nw>t){sr=r;break}
+ if(n('cars')>1||yes('bigh'))sr=Math.max(sr,CFG.surMin);
+ const s17a=s16*sr;O('s17a',s17a);O('s17b',n('s17b'));
+ // filing window
+ const rest=Math.max(0,s16-n('s20')-n('s21')-n('s22'));
+ let s18=n('pen');
+ if(s16>0){
+  if(win===1)s18-=Math.min(rest*CFG.early.pct,CFG.early.cap);
+  if(CFG.late[win])s18+=Math.max(s16*CFG.late[win][0],CFG.late[win][1]);
+ }
+ O('s18',s18);
+ const s19=s16+s17a+n('s17b')+s18;O('s19',s19);
+ const s24=n('s20')+n('s21')+n('s22')+n('s23');
+ O('s24',s24);O('s25',Math.max(0,s24-s19));O('due',s19-s24);
+}
+document.querySelectorAll('.panel [data-o]').forEach(()=>0);
+calc();
+show(Math.max(0,Math.min(PANELS.length-1,+(location.hash.slice(2))||0)));
+</script>
+</body>
+</html>
